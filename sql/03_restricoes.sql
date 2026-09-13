@@ -104,3 +104,9 @@ CREATE INDEX ix_disciplina_ementa_fts
     USING gin(
         to_tsvector('portuguese', coalesce(ementa, ''))
     );
+
+
+-- Garante que cada curso tenha no máximo um currículo ativo
+CREATE UNIQUE INDEX uq_curriculo_ativo
+    ON curriculo(curso_id)
+    WHERE ativo;

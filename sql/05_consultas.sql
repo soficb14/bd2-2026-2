@@ -73,8 +73,12 @@ ORDER BY a.nome;
 -- ---------------------------------------------------------------------
 -- Consulta 5 — agregação com HAVING
 -- Disciplinas cuja média geral de rendimento (média das médias finais
--- de todos os alunos já avaliados) está abaixo de 6. HAVING filtra
--- sobre o resultado já agregado, diferente do WHERE da Consulta 1.
+-- de todos os alunos já avaliados) está abaixo da média geral de TODAS
+-- as disciplinas. HAVING filtra sobre o resultado já agregado, diferente
+-- do WHERE da Consulta 1 — e usar a média geral como corte (em vez de um
+-- número fixo tipo "6") é mais robusto: sempre aponta as disciplinas
+-- relativamente mais fracas, não depende de decidir um limiar arbitrário
+-- que pode não bater com a distribuição real dos dados.
 -- ---------------------------------------------------------------------
 SELECT d.codigo, d.nome,
        ROUND(AVG(h.media_final), 2) AS media_disciplina,
@@ -85,7 +89,9 @@ JOIN turma t      ON t.id = m.turma_id
 JOIN disciplina d ON d.id = t.disciplina_id
 WHERE h.media_final IS NOT NULL
 GROUP BY d.codigo, d.nome
-HAVING AVG(h.media_final) < 6
+HAVING AVG(h.media_final) < (
+    SELECT AVG(media_final) FROM historico WHERE media_final IS NOT NULL
+)
 ORDER BY media_disciplina;
 
 -- ---------------------------------------------------------------------
@@ -163,7 +169,7 @@ ORDER BY d.codigo;
 SELECT c.codigo AS curso, a.nome AS aluno, h.media_final,
        RANK() OVER (PARTITION BY c.codigo ORDER BY h.media_final DESC) AS posicao_no_curso,
        ROUND(
-           PERCENT_RANK() OVER (PARTITION BY c.codigo ORDER BY h.media_final) * 100,
+           (PERCENT_RANK() OVER (PARTITION BY c.codigo ORDER BY h.media_final) * 100)::numeric,
            1
        ) AS percentil
 FROM historico h

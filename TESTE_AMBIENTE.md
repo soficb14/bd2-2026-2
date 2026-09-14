@@ -25,9 +25,34 @@ docker compose logs -f      # acompanhe até a inicialização terminar
 
 ## 2. Execução dos scripts, na ordem
 
-Rode cada arquivo de `sql/` na ordem (via `psql`, DBeaver ou pgAdmin, com
-`SET search_path TO academico;` antes):
+**Importante:** o banco `matricula` (que já vem pronto no container) é o
+ambiente de PRÁTICA do professor — os scripts de `initdb/` carregam o
+schema/dados dele automaticamente, e não tem nada a ver com o que o
+grupo entregou. Os scripts do NOSSO projeto (`sql/01` a `sql/05`) têm que
+rodar num banco separado e vazio, criado à mão, senão colidem com o
+schema do professor ("already exists" pra tudo). Depois de QUALQUER
+`docker compose down -v` + `up -d`, esse banco separado desaparece
+(ele não é recriado automaticamente) — então o primeiro passo é sempre
+recriá-lo:
 
+```bash
+docker exec -i bd2_postgres psql -U bd2 -d matricula -c "DROP DATABASE IF EXISTS marco1;"
+docker exec -i bd2_postgres psql -U bd2 -d matricula -c "CREATE DATABASE marco1;"
+```
+
+Aí sim, rode cada arquivo de `sql/` na ordem contra o banco `marco1`
+(via `psql`, DBeaver ou pgAdmin — no pgAdmin, conecte no banco `marco1`,
+não no `matricula`, e rode `SET search_path TO academico;` antes):
+
+```bash
+docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/01_tipos.sql
+docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/02_tabelas.sql
+docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/03_restricoes.sql
+docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/04_carga.sql
+docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/05_consultas.sql
+```
+
+Ordem dos arquivos:
 1. `sql/01_tipos.sql`
 2. `sql/02_tabelas.sql`
 3. `sql/03_restricoes.sql`

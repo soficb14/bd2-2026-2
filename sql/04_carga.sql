@@ -277,6 +277,16 @@ VALUES
     ('T05', 5, 2, 5, 'NOTURNO',    60),
     ('T06', 6, 2, 1, 'MATUTINO',   60);
 
+-- Turma extra, de propósito sem nenhuma matrícula: caso de demonstração
+-- para a Consulta 3 (junção externa com agregação). Sem ela, todas as
+-- turmas tinham matrícula e o efeito do LEFT JOIN (manter turma com
+-- ocupadas = 0 em vez de sumir do relatório) não aparecia visualmente.
+-- Segunda turma de BD001 (disciplina_id = 2), período vespertino.
+INSERT INTO turma
+    (codigo, disciplina_id, periodo_letivo_id, professor_id, turno, vagas)
+VALUES
+    ('T07', 2, 2, 2, 'VESPERTINO', 30);
+
 
 -- ============================================================
 -- 12. HORÁRIOS DAS TURMAS
@@ -291,7 +301,8 @@ VALUES
     (3, 3, 2, '[10:00,12:00)'),
     (4, 4, 4, '[14:00,16:00)'),
     (5, 5, 5, '[19:00,21:00)'),
-    (6, 1, 6, '[10:00,12:00)');
+    (6, 1, 6, '[10:00,12:00)'),
+    (7, 1, 3, '[08:00,10:00)');
 
 
 -- ============================================================

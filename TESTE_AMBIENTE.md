@@ -38,20 +38,20 @@ schema do professor ("already exists" pra tudo). Depois de QUALQUER
 recriá-lo:
 
 ```bash
-docker exec -i bd2_postgres psql -U bd2 -d matricula -c "DROP DATABASE IF EXISTS marco1;"
-docker exec -i bd2_postgres psql -U bd2 -d matricula -c "CREATE DATABASE marco1;"
+docker exec -i bd2_postgres psql -U bd2 -d matricula -c "DROP DATABASE IF EXISTS marco3;"
+docker exec -i bd2_postgres psql -U bd2 -d matricula -c "CREATE DATABASE marco3 TEMPLATE template0;"
 ```
 
-Aí sim, rode cada arquivo de `sql/` na ordem contra o banco `marco1`
-(via `psql`, DBeaver ou pgAdmin — no pgAdmin, conecte no banco `marco1`,
+Aí sim, rode cada arquivo de `sql/` na ordem contra o banco `marco3`
+(via `psql`, DBeaver ou pgAdmin — no pgAdmin, conecte no banco `marco3`,
 não no `matricula`, e rode `SET search_path TO academico;` antes):
 
 ```bash
-docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/01_tipos.sql
-docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/02_tabelas.sql
-docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/03_restricoes.sql
-docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/04_carga.sql
-docker exec -i bd2_postgres psql -U bd2 -d marco1 < sql/05_consultas.sql
+docker exec -i bd2_postgres psql -U bd2 -d marco3 < sql/01_tipos.sql
+docker exec -i bd2_postgres psql -U bd2 -d marco3 < sql/02_tabelas.sql
+docker exec -i bd2_postgres psql -U bd2 -d marco3 < sql/03_restricoes.sql
+docker exec -i bd2_postgres psql -U bd2 -d marco3 < sql/04_carga.sql
+docker exec -i bd2_postgres psql -U bd2 -d marco3 < sql/05_consultas.sql
 ```
 
 Ordem dos arquivos:
@@ -65,14 +65,13 @@ Ordem dos arquivos:
 - Se algo quebrou, anote aqui o erro e o que você mudou pra corrigir:
 
 ```
-O Resultado de: 01_tipos.sql foi ERRO.
-O script foi executado diretamente pelo PostgreSQL utilizando:
+Os quatro primeiros scripts foram executados sem erro no banco separado marco3, criado com TEMPLATE template0.
 
-  `Get-Content .\sql\01_tipos.sql | docker exec -i bd2_postgres psql -U bd2 -d matricula`
+01_tipos.sql: executado sem erro.
+02_tabelas.sql: executado sem erro.
+03_restricoes.sql: executado sem erro.
+04_carga.sql: executado sem erro.
 
-Foram identificados erros informando que o schema `academico` e os tipos/domínios (`turno_t`, `tipo_disc_t`, `vinculo_t`, `status_mat_t`, `situacao_t`, `tipo_sala_t`, `nota_t`, `pct_t` e `timerange`) já existem. A causa identificada é que o `docker-compose.yml` monta a pasta `initdb/` no PostgreSQL e, na inicialização do banco vazio, os arquivos `initdb/01_modelo.sql` e `initdb/02_dados.sql` já criam e carregam esses objetos.
-
-O Resultado de: 02_tabelas.sql foi
 ```
 
 ## 3. Conferência dos mínimos do Marco 1
@@ -86,16 +85,18 @@ SELECT count(*) FROM matricula;   -- mínimo exigido: 300
 ```
 
 ```
-(cole aqui os três números)
+aluno: 120
+turma: 7
+matricula: 300
 ```
 
-- [ ] Os três mínimos do edital foram atingidos
+- [ x ] Os três mínimos do edital foram atingidos
 
 ## 4. As 10 consultas rodam e fazem sentido
 
 Rode as 10 consultas de `sql/05_consultas.sql` uma a uma.
 
-- [ ] Todas as 10 executaram sem erro
+- [x] Todas as 10 executaram sem erro
 - Para as duas recursivas (Consulta 6 e Consulta 7) e a Consulta 3 (junção
   externa com agregação), cole uma amostra do resultado (bastam as
   primeiras linhas) — são as três que mais provavelmente caem na
@@ -103,13 +104,16 @@ Rode as 10 consultas de `sql/05_consultas.sql` uma a uma.
 
 ```
 Consulta 3 (ocupação de turmas):
-(cole aqui)
+turma_id | codigo | disciplina | vagas | ocupadas | vagas_restantes
+7        | T07    | BD001      | 30    | 0        | 30
 
 Consulta 6 (árvore de pré-requisitos de ENG001):
-(cole aqui)
+1 | POO001 | Programação Orientada a Objetos
+2 | ALG001 | Algoritmos e Programação
 
 Consulta 7 (disciplinas que o aluno já pode cursar):
-(cole aqui)
+ALG001 | Algoritmos e Programação
+BD001  | Banco de Dados
 ```
 
 ## 5. Problemas encontrados e correções
@@ -120,7 +124,12 @@ Marco 1, e pode virar pergunta na arguição cruzada sobre por que o
 ambiente precisou desse ajuste):
 
 ```
-(descreva, ou escreva "nada a corrigir")
+1. O banco matricula já possui dados e objetos carregados pelo initdb, portanto os scripts do grupo foram testados em um banco separado e vazio (marco3).
+
+2. A Consulta 8 precisou de um cast para numeric na função ROUND, pois PERCENT_RANK() retorna double precision.
+
+3. Foi adicionada a turma T07 sem matrículas para demonstrar o funcionamento do LEFT JOIN na Consulta 3.
+
 ```
 
 ---

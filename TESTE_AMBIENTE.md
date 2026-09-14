@@ -20,7 +20,9 @@ docker compose logs -f      # acompanhe até a inicialização terminar
 - Cole aqui a saída de `docker compose ps`:
 
 ```
-(cole aqui)
+NAME           IMAGE                   COMMAND                  SERVICE    CREATED         STATUS                   PORTS
+bd2_pgadmin    dpage/pgadmin4:latest   "/entrypoint.sh"         pgadmin    2 minutes ago   Up 2 minutes             0.0.0.0:8080->80/tcp, [::]:8080->80/tcp
+bd2_postgres   postgres:16             "docker-entrypoint.s…"   postgres   2 minutes ago   Up 2 minutes (healthy)   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
 ```
 
 ## 2. Execução dos scripts, na ordem
@@ -63,7 +65,14 @@ Ordem dos arquivos:
 - Se algo quebrou, anote aqui o erro e o que você mudou pra corrigir:
 
 ```
-(cole aqui, ou escreva "nenhum erro")
+O Resultado de: 01_tipos.sql foi ERRO.
+O script foi executado diretamente pelo PostgreSQL utilizando:
+
+  `Get-Content .\sql\01_tipos.sql | docker exec -i bd2_postgres psql -U bd2 -d matricula`
+
+Foram identificados erros informando que o schema `academico` e os tipos/domínios (`turno_t`, `tipo_disc_t`, `vinculo_t`, `status_mat_t`, `situacao_t`, `tipo_sala_t`, `nota_t`, `pct_t` e `timerange`) já existem. A causa identificada é que o `docker-compose.yml` monta a pasta `initdb/` no PostgreSQL e, na inicialização do banco vazio, os arquivos `initdb/01_modelo.sql` e `initdb/02_dados.sql` já criam e carregam esses objetos.
+
+O Resultado de: 02_tabelas.sql foi
 ```
 
 ## 3. Conferência dos mínimos do Marco 1

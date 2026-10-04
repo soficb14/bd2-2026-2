@@ -4,7 +4,7 @@
 
 - **Sofia** (@soficb14)
 - **Pedro** (@nobony)
-- **Victor**
+- **Victor** (@Naive05)
 
 ## Contribuições — Marco 1
 
@@ -13,7 +13,7 @@
 | Tipos, domínios, tabelas, restrições estruturais, trigger de vagas e índices | Sofia | `sql/01_tipos.sql`, `sql/02_tabelas.sql`, `sql/03_restricoes.sql` |
 | Carga de dados do projeto (120 alunos, 6 turmas, 300 matrículas) | Sofia | `sql/04_carga.sql` |
 | 10 consultas de complexidade crescente | Pedro | `sql/05_consultas.sql` |
-| _(preencher)_ | Victor | _(preencher)_ |
+| Infraestrutura Docker, Orquestração de containers | Victor | `docker-compose.yml`, ambiente pgAdmin |
 
 ## Responsabilidade técnica formal (Seção 3 do edital)
 

@@ -30,6 +30,7 @@ DECLARE
     v_vagas   smallint;
     v_ocupadas integer;
 BEGIN
+    IF NEW.status = 'MATRICULADO' THEN
     SELECT vagas
       INTO v_vagas
       FROM turma

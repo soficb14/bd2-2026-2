@@ -1,0 +1,8 @@
+# dumps do backup contêm hashes de senha dos papéis (globais_*.sql)
+backup/
+
+# saídas antigas geradas fora do repositório
+Claude outputs/
+
+# fragmentos antigos aguardando exclusão manual
+_to_delete/

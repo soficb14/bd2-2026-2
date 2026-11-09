@@ -54,6 +54,8 @@ docker exec -i bd2_postgres psql -U bd2 -d marco3 < sql/04_carga.sql
 docker exec -i bd2_postgres psql -U bd2 -d marco3 < sql/05_consultas.sql
 ```
 
+(Os scripts `sql/06` a `sql/09` — views, índices, concorrência e segurança — do Marco 2 rodam depois, na mesma ordem; ver `README.md`. O modelo é o de **16 tabelas** com prefixo `tb_`, conforme `docs/modelo_logico.drawio`.)
+
 Ordem dos arquivos:
 1. `sql/01_tipos.sql`
 2. `sql/02_tabelas.sql`
@@ -79,9 +81,9 @@ Os quatro primeiros scripts foram executados sem erro no banco separado marco3, 
 Rode e cole o resultado de cada contagem:
 
 ```sql
-SELECT count(*) FROM aluno;       -- mínimo exigido: 100
-SELECT count(*) FROM turma;       -- mínimo exigido: 6
-SELECT count(*) FROM matricula;   -- mínimo exigido: 300
+SELECT count(*) FROM tb_aluno;       -- mínimo exigido: 100
+SELECT count(*) FROM tb_turma;       -- mínimo exigido: 6
+SELECT count(*) FROM tb_matricula;   -- mínimo exigido: 300
 ```
 
 ```

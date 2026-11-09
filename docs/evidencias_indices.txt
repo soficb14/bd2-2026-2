@@ -1,0 +1,257 @@
+SET
+SET
+DROP SCHEMA
+CREATE SCHEMA
+SET
+ setseed 
+---------
+ 
+(1 row)
+
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+SELECT 600000
+INSERT 0 600000
+INSERT 0 600000
+INSERT 0 30000
+INSERT 0 1000000
+DROP TABLE
+VACUUM
+VACUUM
+VACUUM
+VACUUM
+CREATE TABLE
+CREATE FUNCTION
+                            bloco                             
+--------------------------------------------------------------
+ === ÍNDICE 1: ix_matricula_turma_ativa (parcial) — ANTES ===
+(1 row)
+
+ medir 
+-------
+ 
+(1 row)
+
+                                                              QUERY PLAN                                                              
+--------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=8572.36..8572.37 rows=1 width=8) (actual time=23.458..28.551 rows=1 loops=1)
+   Buffers: shared hit=3822
+   ->  Gather  (cost=8572.15..8572.36 rows=2 width=8) (actual time=23.320..28.545 rows=3 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=3822
+         ->  Partial Aggregate  (cost=7572.15..7572.16 rows=1 width=8) (actual time=9.135..9.135 rows=1 loops=3)
+               Buffers: shared hit=3822
+               ->  Parallel Seq Scan on tb_matricula  (cost=0.00..7572.00 rows=58 width=0) (actual time=0.198..9.126 rows=47 loops=3)
+                     Filter: ((id_turma = 1500) AND (status_matricula = 'MATRICULADO'::status_mat_t))
+                     Rows Removed by Filter: 199953
+                     Buffers: shared hit=3822
+ Planning Time: 0.056 ms
+ Execution Time: 28.578 ms
+(14 rows)
+
+CREATE INDEX
+VACUUM
+                             bloco                             
+---------------------------------------------------------------
+ === ÍNDICE 1: ix_matricula_turma_ativa (parcial) — DEPOIS ===
+(1 row)
+
+ medir 
+-------
+ 
+(1 row)
+
+                                                                      QUERY PLAN                                                                      
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=7.20..7.21 rows=1 width=8) (actual time=0.033..0.033 rows=1 loops=1)
+   Buffers: shared hit=4
+   ->  Index Only Scan using ix_matricula_turma_ativa on tb_matricula  (cost=0.42..6.86 rows=139 width=0) (actual time=0.010..0.021 rows=141 loops=1)
+         Index Cond: (id_turma = 1500)
+         Heap Fetches: 0
+         Buffers: shared hit=4
+ Planning Time: 0.057 ms
+ Execution Time: 0.046 ms
+(8 rows)
+
+                           bloco                           
+-----------------------------------------------------------
+ === ÍNDICE 2: ix_historico_situacao (parcial) — ANTES ===
+(1 row)
+
+ medir 
+-------
+ 
+(1 row)
+
+                                                                QUERY PLAN                                                                
+------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=7373.78..7373.79 rows=1 width=8) (actual time=22.694..27.736 rows=1 loops=1)
+   Buffers: shared hit=3244
+   ->  Gather  (cost=7373.56..7373.77 rows=2 width=8) (actual time=22.559..27.730 rows=3 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=3244
+         ->  Partial Aggregate  (cost=6373.56..6373.57 rows=1 width=8) (actual time=8.352..8.352 rows=1 loops=3)
+               Buffers: shared hit=3244
+               ->  Parallel Seq Scan on tb_historico  (cost=0.00..6369.00 rows=1825 width=0) (actual time=0.013..8.284 rows=1399 loops=3)
+                     Filter: (situacao = 'REPROVADO_FALTA'::situacao_t)
+                     Rows Removed by Filter: 198601
+                     Buffers: shared hit=3244
+ Planning Time: 0.057 ms
+ Execution Time: 27.758 ms
+(14 rows)
+
+CREATE INDEX
+VACUUM
+                           bloco                            
+------------------------------------------------------------
+ === ÍNDICE 2: ix_historico_situacao (parcial) — DEPOIS ===
+(1 row)
+
+ medir 
+-------
+ 
+(1 row)
+
+                                                                      QUERY PLAN                                                                      
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=106.30..106.31 rows=1 width=8) (actual time=0.647..0.648 rows=1 loops=1)
+   Buffers: shared hit=6
+   ->  Index Only Scan using ix_historico_situacao on tb_historico  (cost=0.29..95.05 rows=4500 width=0) (actual time=0.010..0.333 rows=4198 loops=1)
+         Index Cond: (situacao = 'REPROVADO_FALTA'::situacao_t)
+         Heap Fetches: 0
+         Buffers: shared hit=6
+ Planning Time: 0.055 ms
+ Execution Time: 0.659 ms
+(8 rows)
+
+                          bloco                           
+----------------------------------------------------------
+ === ÍNDICE 3: ix_disciplina_ementa_fts (GIN) — ANTES ===
+(1 row)
+
+ medir 
+-------
+ 
+(1 row)
+
+                                                   QUERY PLAN                                                   
+----------------------------------------------------------------------------------------------------------------
+ Seq Scan on tb_disciplina  (cost=0.00..8533.00 rows=150 width=10) (actual time=6.854..314.619 rows=60 loops=1)
+   Filter: (to_tsvector('portuguese'::regconfig, COALESCE(ementa, ''::text)) @@ '''serializ'''::tsquery)
+   Rows Removed by Filter: 29940
+   Buffers: shared hit=658
+ Planning Time: 0.044 ms
+ Execution Time: 314.649 ms
+(6 rows)
+
+CREATE INDEX
+VACUUM
+                           bloco                           
+-----------------------------------------------------------
+ === ÍNDICE 3: ix_disciplina_ementa_fts (GIN) — DEPOIS ===
+(1 row)
+
+ medir 
+-------
+ 
+(1 row)
+
+                                                             QUERY PLAN                                                             
+------------------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on tb_disciplina  (cost=17.09..213.18 rows=60 width=10) (actual time=0.022..0.066 rows=60 loops=1)
+   Recheck Cond: (to_tsvector('portuguese'::regconfig, COALESCE(ementa, ''::text)) @@ '''serializ'''::tsquery)
+   Heap Blocks: exact=60
+   Buffers: shared hit=62
+   ->  Bitmap Index Scan on ix_disciplina_ementa_fts  (cost=0.00..17.08 rows=60 width=0) (actual time=0.011..0.011 rows=60 loops=1)
+         Index Cond: (to_tsvector('portuguese'::regconfig, COALESCE(ementa, ''::text)) @@ '''serializ'''::tsquery)
+         Buffers: shared hit=2
+ Planning:
+   Buffers: shared hit=1
+ Planning Time: 0.055 ms
+ Execution Time: 0.081 ms
+(11 rows)
+
+                      bloco                       
+--------------------------------------------------
+ === ÍNDICE 4: ix_log_ocorrido (BRIN) — ANTES ===
+(1 row)
+
+ medir 
+-------
+ 
+(1 row)
+
+                                                                                QUERY PLAN                                                                                
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Finalize Aggregate  (cost=13965.07..13965.08 rows=1 width=8) (actual time=40.505..47.974 rows=1 loops=1)
+   Buffers: shared hit=4936 read=1776
+   ->  Gather  (cost=13964.86..13965.07 rows=2 width=8) (actual time=40.374..47.960 rows=3 loops=1)
+         Workers Planned: 2
+         Workers Launched: 2
+         Buffers: shared hit=4936 read=1776
+         ->  Partial Aggregate  (cost=12964.86..12964.87 rows=1 width=8) (actual time=23.650..23.651 rows=1 loops=3)
+               Buffers: shared hit=4936 read=1776
+               ->  Parallel Seq Scan on tb_log_matricula  (cost=0.00..12962.00 rows=1143 width=0) (actual time=14.792..23.595 rows=960 loops=3)
+                     Filter: ((ocorrido_em >= '2026-03-15 00:00:00'::timestamp without time zone) AND (ocorrido_em < '2026-03-16 00:00:00'::timestamp without time zone))
+                     Rows Removed by Filter: 332373
+                     Buffers: shared hit=4936 read=1776
+ Planning Time: 0.066 ms
+ Execution Time: 48.002 ms
+(14 rows)
+
+CREATE INDEX
+VACUUM
+                       bloco                       
+---------------------------------------------------
+ === ÍNDICE 4: ix_log_ocorrido (BRIN) — DEPOIS ===
+(1 row)
+
+ medir 
+-------
+ 
+(1 row)
+
+                                                                               QUERY PLAN                                                                               
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Aggregate  (cost=7015.37..7015.38 rows=1 width=8) (actual time=1.675..1.676 rows=1 loops=1)
+   Buffers: shared hit=130
+   ->  Bitmap Heap Scan on tb_log_matricula  (cost=12.79..7007.81 rows=3025 width=0) (actual time=0.058..1.549 rows=2880 loops=1)
+         Recheck Cond: ((ocorrido_em >= '2026-03-15 00:00:00'::timestamp without time zone) AND (ocorrido_em < '2026-03-16 00:00:00'::timestamp without time zone))
+         Rows Removed by Index Recheck: 16192
+         Heap Blocks: lossy=128
+         Buffers: shared hit=130
+         ->  Bitmap Index Scan on ix_log_ocorrido  (cost=0.00..12.03 rows=18868 width=0) (actual time=0.018..0.018 rows=1280 loops=1)
+               Index Cond: ((ocorrido_em >= '2026-03-15 00:00:00'::timestamp without time zone) AND (ocorrido_em < '2026-03-16 00:00:00'::timestamp without time zone))
+               Buffers: shared hit=2
+ Planning:
+   Buffers: shared hit=1
+ Planning Time: 0.076 ms
+ Execution Time: 1.705 ms
+(14 rows)
+
+              bloco               
+----------------------------------
+ === TAMANHO: tabela x índice ===
+(1 row)
+
+          indice          |                                                                definicao                                                                 | tamanho_indice | tamanho_tabela 
+--------------------------+------------------------------------------------------------------------------------------------------------------------------------------+----------------+----------------
+ ix_disciplina_ementa_fts | CREATE INDEX ix_disciplina_ementa_fts ON perf.tb_disciplina USING gin (to_tsvector('portuguese'::regconfig, COALESCE(ementa, ''::text))) | 496 kB         | 5264 kB
+ ix_historico_situacao    | CREATE INDEX ix_historico_situacao ON perf.tb_historico USING btree (situacao) WHERE (situacao <> 'CURSANDO'::situacao_t)                | 1624 kB        | 25 MB
+ ix_log_ocorrido          | CREATE INDEX ix_log_ocorrido ON perf.tb_log_matricula USING brin (ocorrido_em)                                                           | 24 kB          | 52 MB
+ ix_matricula_turma_ativa | CREATE INDEX ix_matricula_turma_ativa ON perf.tb_matricula USING btree (id_turma) WHERE (status_matricula = 'MATRICULADO'::status_mat_t) | 2760 kB        | 30 MB
+(4 rows)
+
+DO
+           indice           | plano_antes |                plano_depois                 | antes_ms | depois_ms | ganho_x | buffers_antes | buffers_depois 
+----------------------------+-------------+---------------------------------------------+----------+-----------+---------+---------------+----------------
+ 1 ix_matricula_turma_ativa | Seq Scan    | Index Only Scan [ix_matricula_turma_ativa]  |   27.630 |     0.038 |   727.1 |          3822 |              4
+ 2 ix_historico_situacao    | Seq Scan    | Index Only Scan [ix_historico_situacao]     |   27.385 |     0.332 |    82.5 |          3244 |              6
+ 3 ix_disciplina_ementa_fts | Seq Scan    | Bitmap Heap Scan [ix_disciplina_ementa_fts] |  308.871 |     0.058 |  5325.4 |           658 |             62
+ 4 ix_log_ocorrido          | Seq Scan    | Bitmap Heap Scan [ix_log_ocorrido]          |   42.376 |     1.511 |    28.0 |          6712 |            130
+(4 rows)
+

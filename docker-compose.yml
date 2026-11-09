@@ -47,6 +47,10 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
       - "8080:80"
+    volumes:
+      # scripts do projeto visíveis dentro do pgAdmin (Query Tool > abrir arquivo > /projeto/sql)
+      - ./sql:/projeto/sql:ro
+      - ./docs:/projeto/docs:ro
     depends_on:
       postgres:
         condition: service_healthy

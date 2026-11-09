@@ -1,0 +1,10 @@
+
+MODO (10 rodadas, 20 clientes, 5 vagas)    matric.    estouro    lat.media    retries  tempo total
+------------------------------------------------------------------------------------------------
+1) sem proteção (READ COMMITTED)        200        150      46.1 ms          0        2.3 s
+2) FOR UPDATE (bloqueio explícito)         50          0     201.3 ms          0        3.9 s
+3) SERIALIZABLE (com retentativa)          50          0     180.6 ms      11078        3.5 s
+
+Legenda: matric. = total de matrículas aceitas (o correto é 10 x 5 = 50);
+estouro = matrículas ALÉM das vagas (anomalia); lat.media = latência média por transação;
+retries = transações repetidas pelo pgbench após erro 40001 (só faz sentido em SERIALIZABLE).
